@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Essay Tulis di Kertas - Shokyuu 2 Bab 4</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 35px 30px;
+            max-width: 750px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .container::before {
+            content: '';
+            display: block;
+            height: 6px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            border-radius: 25px 25px 0 0;
+            margin: -35px -30px 20px -30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .title { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+        .title span { color: #e94560; }
+        .stats { display: flex; gap: 12px; font-size: 13px; font-weight: 600; color: #555; }
+        .stats div { background: #f0f0f0; padding: 3px 12px; border-radius: 20px; }
+        .stats .num { color: #e94560; font-size: 16px; }
+        .session-badge {
+            background: #e94560;
+            color: white;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .session-badge .sub { font-weight: 400; font-size: 12px; }
+        .session-badge.sesi2 { background: #9b59b6; }
+        .progress-bar { width: 100%; height: 6px; background: #e0e0e0; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #feca57); border-radius: 10px; transition: width 0.4s; width: 0%; }
+        .timer-container { text-align: center; margin-bottom: 15px; }
+        .timer {
+            display: inline-block;
+            font-size: 52px;
+            font-weight: 700;
+            color: #1a1a2e;
+            background: #f8f9fa;
+            padding: 5px 35px;
+            border-radius: 15px;
+            min-width: 110px;
+        }
+        .timer.warning { color: #e94560; animation: blink 0.8s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .question-number { font-size: 14px; color: #888; text-align: center; margin-bottom: 5px; font-weight: 600; }
+        .question-text {
+            font-size: 34px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 30px 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            min-height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 3px dashed #e0e0e0;
+        }
+        .question-text .kanji { color: #9b59b6; font-size: 52px; }
+        .next-info {
+            font-size: 14px;
+            color: #aaa;
+            text-align: center;
+            margin-top: 12px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .result-screen { display: none; text-align: center; padding: 15px 0; }
+        .result-screen .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #feca57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 40px rgba(233,69,96,0.3);
+        }
+        .result-screen .score-circle .score-text { font-size: 36px; font-weight: 800; color: white; }
+        .result-screen .score-circle .score-text small { font-size: 18px; font-weight: 400; }
+        .result-screen h2 { font-size: 26px; color: #1a1a2e; margin-bottom: 5px; }
+        .result-screen p { color: #666; font-size: 15px; margin-bottom: 5px; }
+        .btn-restart {
+            margin-top: 15px;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #e94560, #c0392b);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-restart:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(233,69,96,0.35); }
+        .start-screen { text-align: center; padding: 15px 0; }
+        .start-screen h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 5px; }
+        .start-screen h1 span { color: #e94560; }
+        .start-screen p { color: #666; font-size: 15px; margin-bottom: 5px; }
+        .start-screen .rules {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin: 12px 0 20px;
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+        .start-screen .rules li { margin: 4px 0; list-style: none; }
+        .btn-start {
+            padding: 14px 50px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #e94560, #c0392b);
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 10px 35px rgba(233,69,96,0.4); }
+        .hidden { display: none !important; }
+        .session-info {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .session-transition {
+            text-align: center;
+            padding: 30px 20px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            margin: 10px 0;
+        }
+        .session-transition .big-icon { font-size: 48px; }
+        .session-transition h3 { font-size: 24px; color: #1a1a2e; margin: 10px 0; }
+        .session-transition p { color: #666; font-size: 16px; }
+        .btn-continue {
+            margin-top: 15px;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #e94560, #c0392b);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-continue:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(233,69,96,0.35); }
+        .identitas-form {
+            text-align: center;
+            padding: 20px 0 10px 0;
+        }
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #1a1a2e;
+            background: white;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: #e94560;
+            box-shadow: 0 0 0 3px rgba(233,69,96,0.15);
+        }
+        .btn-submit-identitas {
+            padding: 14px 50px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #e94560, #c0392b);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-submit-identitas:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233,69,96,0.35);
+        }
+        .btn-submit-identitas:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+        .kertas-note {
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #7a5c00;
+            text-align: center;
+        }
+        .logo-pembuka {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            border: 4px solid #e94560;
+            box-shadow: 0 8px 25px rgba(233,69,96,0.3);
+        }
+        @media (max-width: 500px) {
+            .logo-pembuka { width: 140px; height: 140px; }
+            .timer { font-size: 36px; padding: 2px 20px; min-width: 80px; }
+            .question-text { font-size: 24px; }
+            .question-text .kanji { font-size: 36px; }
+            .container { padding: 25px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+    <div class="start-screen" id="startScreen">
+        <!-- GANTI src DENGAN FILE GIF ANDA -->
+        <img src="logo.gif" alt="Logo Kuis" class="logo-pembuka">
+        <h1>Kuis <span>Essay</span></h1>
+        <p>Shokyuu 2 Bab 4 - Tulis di Kertas ✏️</p>
+        
+        <div class="identitas-form">
+            <div class="form-group">
+                <label for="inputNama">👤 Nama Lengkap</label>
+                <input type="text" id="inputNama" placeholder="Masukkan nama Anda...">
+            </div>
+            <div class="form-group">
+                <label for="inputKelas">🏫 Kelas</label>
+                <input type="text" id="inputKelas" placeholder="Masukkan kelas Anda...">
+            </div>
+            <div id="errorIdentitas" class="error-msg">⚠️ Nama dan kelas harus diisi!</div>
+            <button class="btn-submit-identitas" id="btnMulai" onclick="submitIdentitas()">Mulai Kuis 🚀</button>
+        </div>
+        
+        <div class="rules" style="margin-top:15px;">
+            <li>📝 <strong>64 soal</strong> total (2 sesi)</li>
+            <li>🇮🇩→🇯🇵 <strong>Sesi 1:</strong> 55 soal (Indonesia → Jepang hiragana)</li>
+            <li>🈶→ひ <strong>Sesi 2:</strong> 9 soal (Kanji → Hiragana)</li>
+            <li>✏️ Jawaban <strong>ditulis di kertas</strong>, bukan diketik</li>
+            <li>⏱️ <strong>15 detik</strong> per soal, otomatis pindah</li>
+            <li>🔢 Soal <strong>berurutan</strong> (tidak diacak)</li>
+        </div>
+    </div>
+
+    <div id="quizScreen" class="hidden">
+        <div class="header">
+            <div class="title">📝 Kuis <span>Essay</span></div>
+            <div class="stats">
+                <div>📌 <span class="num" id="currentNum">1</span>/<span id="totalNum">64</span></div>
+            </div>
+        </div>
+        
+        <div class="session-badge" id="sessionBadge">
+            🇮🇩→🇯🇵 <span class="sub">Sesi 1</span>
+        </div>
+        
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="timer-container"><div class="timer" id="timerDisplay">15</div></div>
+        <div class="question-number" id="qNumber">Soal 1 dari 64</div>
+        <div class="session-info" id="sessionInfo">🇮🇩 Indonesia → 🇯🇵 Jepang (Tulis hiragana di kertas)</div>
+        
+        <div class="kertas-note">✏️ Tulis jawaban di kertas — jawaban tidak ditampilkan</div>
+        
+        <div class="question-text" id="questionText">
+            <span id="mainText">asli; autentik</span>
+        </div>
+        
+        <div class="next-info" id="nextInfo">⏳ Otomatis pindah ke soal berikutnya setelah 15 detik...</div>
+    </div>
+
+    <div id="transitionScreen" class="hidden">
+        <div class="session-transition">
+            <div class="big-icon">🔄</div>
+            <h3>Sesi 1 Selesai! 🎉</h3>
+            <p>Siap untuk <strong>Sesi 2</strong>?<br>🈶 Kanji → ひ Hiragana</p>
+            <button class="btn-continue" onclick="startSession2()">Lanjut Sesi 2 →</button>
+        </div>
+    </div>
+
+    <div class="result-screen" id="resultScreen">
+        <div class="score-circle"><div class="score-text"><span id="finalScore">64</span><small>/64</small></div></div>
+        <h2>🎉 Kuis Selesai!</h2>
+        <p id="resultDesc">Semua soal telah ditampilkan.</p>
+        <div style="margin:15px 0;padding:15px;background:#f8f9fa;border-radius:12px;text-align:left;font-size:14px;color:#555;">
+            <p>📝 <strong>Catatan:</strong></p>
+            <p>• Jawaban ditulis di kertas masing-masing.</p>
+            <p>• Cocokkan jawaban dengan kunci dari guru.</p>
+            <p>• Total soal: <strong>64 soal</strong>.</p>
+        </div>
+        <div style="margin-top:12px;font-size:14px;color:#2ecc71;">
+            ✅ Data telah disimpan ke Google Sheets
+        </div>
+        <button class="btn-restart" onclick="restartQuiz()">🔄 Ulangi Kuis</button>
+    </div>
+</div>
+
+<script>
+// ===== SESI 1: KOSAKATA (55 SOAL) =====
+// Soal Indonesia, jawaban HIRAGANA (untuk kunci guru)
+const KOTOBA = [
+    { q: "asli; autentik", answer: "ほんもの" },
+    { q: "ayam", answer: "とり" },
+    { q: "pacar; kekasih (perempuan)", answer: "かのじょ" },
+    { q: "makan", answer: "しょくじ" },
+    { q: "lokal", answer: "とち" },
+    { q: "papan nama", answer: "かんばん" },
+    { q: "sekitar sini", answer: "このへん" },
+    { q: "baru", answer: "あたらしく" },
+    { q: "dibuka; rampung", answer: "できる" },
+    { q: "peta", answer: "ちず" },
+    { q: "mengirim", answer: "おくる" },
+    { q: "sekitar; dekat sini", answer: "このあたり" },
+    { q: "pasangan suami istri", answer: "ふうふ" },
+    { q: "Saya tidak mengetahui sebelumnya", answer: "しりませんでした" },
+    { q: "mencelupkan", answer: "つける" },
+    { q: "mencampurkan", answer: "まぜる" },
+    { q: "menuangkan", answer: "かける" },
+    { q: "memasukkan; menambahkan", answer: "いれる" },
+    { q: "menggulung", answer: "まく" },
+    { q: "menambahkan; menaruh di atas", answer: "のせる" },
+    { q: "mengupas", answer: "むく" },
+    { q: "berbumbu", answer: "あじがついている" },
+    { q: "kecap asin khas Jepang", answer: "しょうゆ" },
+    { q: "saus kaldu", answer: "つゆ" },
+    { q: "begitu saja", answer: "そのまま" },
+    { q: "rumput laut", answer: "のり" },
+    { q: "kulit", answer: "かわ" },
+    { q: "Terima kasih telah menunggu", answer: "おまたせしました" },
+    { q: "sekaligus", answer: "いちどに" },
+    { q: "sebegitu (banyak)", answer: "そんなに" },
+    { q: "seperti ini", answer: "こうやって" },
+    { q: "tidak ada rasa", answer: "あじがない" },
+    { q: "cuka ponzu", answer: "ポンず" },
+    { q: "saus wijen", answer: "ごまだれ" },
+    { q: "sawi putih", answer: "はくさい" },
+    { q: "bumbu; rempah", answer: "ちょうみりょう" },
+    { q: "gula", answer: "さとう" },
+    { q: "lada", answer: "こしょう" },
+    { q: "minyak", answer: "あぶら" },
+    { q: "cara memasak", answer: "ちょうりほうほう" },
+    { q: "memotong", answer: "きる" },
+    { q: "memanggang", answer: "やく" },
+    { q: "menggodok; merebus", answer: "にる" },
+    { q: "merebus", answer: "ゆでる" },
+    { q: "mengukus", answer: "むす" },
+    { q: "menumis", answer: "いためる" },
+    { q: "menggoreng", answer: "あげる" },
+    { q: "pangsit khas Jepang", answer: "ぎょうざ" },
+    { q: "masakan rumahan", answer: "かていりょうり" },
+    { q: "kacang", answer: "まめ" },
+    { q: "tepung gandum; terigu", answer: "こむぎこ" },
+    { q: "telur rebus", answer: "ゆでたまご" },
+    { q: "dan lain-lain", answer: "など" },
+    { q: "pedas manis", answer: "あまからい" },
+    { q: "keras", answer: "かたい" }
+];
+
+// ===== SESI 2: KANJI → HIRAGANA (9 SOAL) =====
+const KANJI_HIRAGANA = [
+    { kanji: "焼きます", hiragana: "やきます" },
+    { kanji: "食べ方", hiragana: "たべかた" },
+    { kanji: "油", hiragana: "あぶら" },
+    { kanji: "定食屋", hiragana: "ていしょくや" },
+    { kanji: "量", hiragana: "りょう" },
+    { kanji: "満足", hiragana: "まんぞく" },
+    { kanji: "切ります", hiragana: "きります" },
+    { kanji: "塩", hiragana: "しお" },
+    { kanji: "入れて", hiragana: "いれて" }
+];
+
+// ===== VARIABLES =====
+let questions = [];
+let currentIndex = 0;
+let timer = 15;
+let timerInterval = null;
+let isTransitioning = false;
+let currentSession = 1;
+const TOTAL = 64;
+const SESI1 = 55;
+let userNama = '';
+let userKelas = '';
+
+// ===== GOOGLE APPS SCRIPT URL =====
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcyG5HJMtK0ZCMDyP1rFmXwJrxQpY5hOHOwIYU66h6cbxit_cKBJK9nuohzxDk28o/exec';
+
+// ===== DOM =====
+const startScreen = document.getElementById('startScreen');
+const quizScreen = document.getElementById('quizScreen');
+const transitionScreen = document.getElementById('transitionScreen');
+const resultScreen = document.getElementById('resultScreen');
+const mainText = document.getElementById('mainText');
+const timerDisplay = document.getElementById('timerDisplay');
+const currentNum = document.getElementById('currentNum');
+const totalNum = document.getElementById('totalNum');
+const progressFill = document.getElementById('progressFill');
+const qNumber = document.getElementById('qNumber');
+const finalScore = document.getElementById('finalScore');
+const resultDesc = document.getElementById('resultDesc');
+const sessionBadge = document.getElementById('sessionBadge');
+const sessionInfo = document.getElementById('sessionInfo');
+const nextInfo = document.getElementById('nextInfo');
+const inputNama = document.getElementById('inputNama');
+const inputKelas = document.getElementById('inputKelas');
+const btnMulai = document.getElementById('btnMulai');
+const errorIdentitas = document.getElementById('errorIdentitas');
+
+function submitIdentitas() {
+    const nama = inputNama.value.trim();
+    const kelas = inputKelas.value.trim();
+    
+    if (nama === '' || kelas === '') {
+        errorIdentitas.classList.add('show');
+        return;
+    }
+    
+    errorIdentitas.classList.remove('show');
+    userNama = nama;
+    userKelas = kelas;
+    btnMulai.disabled = true;
+    btnMulai.textContent = '⏳ Memuat...';
+    
+    setTimeout(() => {
+        startQuiz();
+    }, 500);
+}
+
+function buildQuestions() {
+    // Soal BERURUTAN (tidak diacak)
+    const sesi1 = KOTOBA.map(q => ({ q: q.q, answer: q.answer, mode: 'id_to_jp' }));
+    const sesi2 = KANJI_HIRAGANA.map(q => ({ q: q.kanji, answer: q.hiragana, mode: 'kanji_to_hiragana' }));
+    return [...sesi1, ...sesi2];
+}
+
+function loadQuestion() {
+    if (currentIndex >= questions.length) { endQuiz(); return; }
+
+    const q = questions[currentIndex];
+    const isSesi2 = currentIndex >= SESI1;
+    currentSession = isSesi2 ? 2 : 1;
+    
+    timer = 15;
+    timerDisplay.textContent = timer;
+    timerDisplay.classList.remove('warning');
+    nextInfo.textContent = '⏳ Otomatis pindah ke soal berikutnya setelah 15 detik...';
+
+    if (isSesi2) {
+        sessionBadge.innerHTML = '🈶→ひ <span class="sub">Sesi 2</span>';
+        sessionBadge.className = 'session-badge sesi2';
+        sessionInfo.textContent = '🈶 Kanji → ひ Hiragana (Tulis hiragana di kertas)';
+        mainText.innerHTML = `<span class="kanji">${q.q}</span>`;
+    } else {
+        sessionBadge.innerHTML = '🇮🇩→🇯🇵 <span class="sub">Sesi 1</span>';
+        sessionBadge.className = 'session-badge';
+        sessionInfo.textContent = '🇮🇩 Indonesia → 🇯🇵 Jepang (Tulis hiragana di kertas)';
+        mainText.textContent = q.q;
+    }
+
+    qNumber.textContent = `Soal ${currentIndex + 1} dari ${TOTAL}`;
+    currentNum.textContent = currentIndex + 1;
+    totalNum.textContent = TOTAL;
+    progressFill.style.width = ((currentIndex) / TOTAL * 100) + '%';
+
+    isTransitioning = false;
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timer--;
+        timerDisplay.textContent = timer;
+        if (timer <= 3) timerDisplay.classList.add('warning');
+        if (timer <= 0) {
+            clearInterval(timerInterval);
+            timerDisplay.classList.remove('warning');
+            if (!isTransitioning) {
+                isTransitioning = true;
+                nextInfo.textContent = '⏭️ Pindah ke soal berikutnya...';
+                setTimeout(() => {
+                    nextQuestion();
+                }, 300);
+            }
+        }
+    }, 1000);
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex === SESI1) {
+        // Transisi ke Sesi 2
+        clearInterval(timerInterval);
+        quizScreen.classList.add('hidden');
+        transitionScreen.classList.remove('hidden');
+        return;
+    }
+    if (currentIndex >= questions.length) { endQuiz(); } else { loadQuestion(); }
+}
+
+function startSession2() {
+    transitionScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    loadQuestion();
+}
+
+function endQuiz() {
+    clearInterval(timerInterval);
+    quizScreen.classList.add('hidden');
+    resultScreen.style.display = 'block';
+    finalScore.textContent = '64';
+    resultDesc.textContent = `Semua 64 soal telah ditampilkan. ${userNama ? 'Selamat ' + userNama + '!' : 'Selamat!'}`;
+    
+    kirimData();
+}
+
+function kirimData() {
+    const data = {
+        Bab: "Shokyuu 2 Bab 4 - Essay (Tulis di Kertas)",
+        Nama: userNama,
+        Kelas: userKelas,
+        Skor: "-",
+        Total: TOTAL,
+        PG_Benar: "-",
+        Essay_Benar: "-",
+        Jawaban_Salah: "Dikoreksi manual oleh guru"
+    };
+
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).catch(err => console.log('Error:', err));
+}
+
+function startQuiz() {
+    questions = buildQuestions();
+    currentIndex = 0;
+    startScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    transitionScreen.classList.add('hidden');
+    resultScreen.style.display = 'none';
+    loadQuestion();
+}
+
+function restartQuiz() {
+    resultScreen.style.display = 'none';
+    startScreen.classList.remove('hidden');
+    quizScreen.classList.add('hidden');
+    transitionScreen.classList.add('hidden');
+    currentIndex = 0;
+    clearInterval(timerInterval);
+    inputNama.value = '';
+    inputKelas.value = '';
+    userNama = '';
+    userKelas = '';
+    btnMulai.disabled = false;
+    btnMulai.textContent = 'Mulai Kuis 🚀';
+}
+</script>
+
+</body>
+</html>
